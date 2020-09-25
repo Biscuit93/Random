@@ -20,8 +20,6 @@ void sort         ( int *loc, int size, int byRank );
 void copy         ( int *old, int *new, int size );
 int  moveCard     ( int *from, int *to, int fromSize, int toSize );
 int  moveCards    ( int num, int *from, int *to, int fromSize, int toSize );
-int  pullCard     ( int index, int *from, int *to, int fromSize, int toSize );
-void repairStack  ( int *loc, int size );
 int  rankHand     ( int *hand );
 int  isStraight   ( int *hand, int *high );
 int  isFlush      ( int *hand );
@@ -236,36 +234,6 @@ int moveCards ( int num, int *from, int *to, int fromSize, int toSize )
 		moveCard( from, to, fromSize, toSize );
 }
 
-int pullCard ( int index, int *from, int *to, int fromSize, int toSize )
-{
-	if ( isEmpty( from, fromSize ) )
-		return 1;
-
-	if ( isFull( to, toSize ) )
-		return 2;
-
-	to[ to[ toSize ] ] = from[ index ];
-	to[ toSize ]++;
-	from[ index ] = EMPTY;
-	
-	return 0;
-}
-
-void repairStack ( int *loc, int size )
-{
-	for ( int i = 0, j = loc[ size ]; i < loc[ size ]; i++ )
-	{
-		if ( loc[ i ] == EMPTY )
-		{
-			for ( int j = i; j < loc[ size ] - 1; j++ )
-				swap( loc + j, loc + ( j + 1 ) );
-
-			loc[ size ]--;
-			i--;
-		}
-	}
-}
-
 int rankHand ( int *hand )
 {
 	int four     = EMPTY,
@@ -475,21 +443,32 @@ int *promptSwap ( )
 
 void exchange ( int *hand, int *deck, int *pile )
 {
-	int *discard = promptSwap( );
-	int count = 0;
+	static int hold[ HAND_SIZE + 1 ];
+	int *discard = promptSwap( ),
+	    cardTossed, 
+	    count = 0;
+	initStack( hold, HAND_SIZE, 1 );
 
-	for ( int i = 0; i < HAND_SIZE; i++ )
+	for ( int i = HAND_SIZE - 1; i >= 0; i-- )
 	{
-		if ( discard[ i ] == EMPTY )
-			break;
-		if ( hand[ discard[ i ] ] == EMPTY )
-			continue;
-		pullCard( discard[ i ], hand, pile, HAND_SIZE, PILE_SIZE );	
+		cardTossed = 0;
+		
+		for ( int j = 0; j < HAND_SIZE; j++ )
+		{
+			if ( i == discard[ j ] )
+			{
+				moveCard( hand, pile, HAND_SIZE, PILE_SIZE );
+				cardTossed = 1;
+				count++;
+				break;
+			}
+		}
 
-		count++;
+		if ( !cardTossed )
+			moveCard( hand, hold, HAND_SIZE, HAND_SIZE );
 	}
 
-	repairStack( hand, HAND_SIZE );
+	moveCards( HAND_SIZE - count, hold, hand, HAND_SIZE, HAND_SIZE );
 	moveCards( count, deck, hand, DECK_SIZE, HAND_SIZE );
 }
 
