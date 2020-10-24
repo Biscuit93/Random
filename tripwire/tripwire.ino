@@ -189,7 +189,7 @@ void gotoTrippedState ( )
   if ( mode & MODE_ALARM )
     digitalWrite( PIN_BUZZER,   HIGH );
 
-  //Turn on EXTERNALal device if mode enabled.
+  //Turn on external device if mode enabled.
   if ( mode & MODE_EXTERNAL )
     digitalWrite( PIN_EXTERNAL, HIGH );
 }
