@@ -2,9 +2,9 @@
 #define PIN_SENSE_LIGHT   A7
 #define PIN_BUTTON_MODE   2
 #define PIN_BUTTON_ARM    3
-#define PIN_EXTERN        4
+#define PIN_EXTERNAL      4
 #define PIN_LED_INACTIVE  5
-#define PIN_LED_EXTERN    6
+#define PIN_LED_EXTERNAL  6
 #define PIN_LED_AUTORESET 7
 #define PIN_LED_ACTIVE    9
 #define PIN_BUZZER        10
@@ -16,7 +16,7 @@
 #define RESET_TIME        1000 / SLEEP_TIME
 
 enum STATES { STATE_INACTIVE, STATE_ACTIVE, STATE_TRIPPED };
-enum MODES  { MODE_DISABLED = 0, MODE_ALARM = 1, MODE_EXTERN = 2, MODE_AUTORESET = 4, MODE_RESET = 8 };
+enum MODES  { MODE_DISABLED = 0, MODE_ALARM = 1, MODE_EXTERNAL = 2, MODE_AUTORESET = 4, MODE_RESET = 8 };
 
 int state;
 int mode;
@@ -44,14 +44,14 @@ void setup()
   pinMode( PIN_SENSE_LIGHT,   INPUT  );
 
   //All others set to output.
-  pinMode( PIN_EXTERN,        OUTPUT );
+  pinMode( PIN_EXTERNAL,      OUTPUT );
   pinMode( PIN_BUZZER,        OUTPUT );
   pinMode( PIN_LASER,         OUTPUT );
   
   pinMode( PIN_LED_INACTIVE,  OUTPUT );
   pinMode( PIN_LED_ACTIVE,    OUTPUT );
   pinMode( PIN_LED_AUTORESET, OUTPUT );
-  pinMode( PIN_LED_EXTERN,    OUTPUT );
+  pinMode( PIN_LED_EXTERNAL,  OUTPUT );
   pinMode( PIN_LED_BUZZER,    OUTPUT );
 
   //Attach interrupts to button pins.
@@ -139,14 +139,14 @@ void toggleMode ( )
 void setModeLEDs ( )
 {
   digitalWrite( PIN_LED_BUZZER,    LOW );
-  digitalWrite( PIN_LED_EXTERN,    LOW );
+  digitalWrite( PIN_LED_EXTERNAL,  LOW );
   digitalWrite( PIN_LED_AUTORESET, LOW );
 
   if ( mode & MODE_ALARM )
     digitalWrite( PIN_LED_BUZZER,    HIGH );
 
-  if ( mode & MODE_EXTERN )
-    digitalWrite( PIN_LED_EXTERN,    HIGH );
+  if ( mode & MODE_EXTERNAL )
+    digitalWrite( PIN_LED_EXTERNAL,  HIGH );
 
   if ( mode & MODE_AUTORESET )
     digitalWrite( PIN_LED_AUTORESET, HIGH );
@@ -161,7 +161,7 @@ void gotoInactiveState ( )
   digitalWrite( PIN_LED_ACTIVE,    LOW  );
   digitalWrite( PIN_LASER,         HIGH );
   digitalWrite( PIN_BUZZER,        LOW  );
-  digitalWrite( PIN_EXTERN,        LOW  );
+  digitalWrite( PIN_EXTERNAL,      LOW  );
 }
 
 //Set the state to active and set the pins accordingly.
@@ -173,7 +173,7 @@ void gotoActiveState ( )
   digitalWrite( PIN_LED_ACTIVE,    HIGH );
   digitalWrite( PIN_LASER,         HIGH );
   digitalWrite( PIN_BUZZER,        LOW  );
-  digitalWrite( PIN_EXTERN,        LOW  );
+  digitalWrite( PIN_EXTERNAL,      LOW  );
 }
 
 //Set the state to tripped and set the pins accordingly.
@@ -187,11 +187,11 @@ void gotoTrippedState ( )
 
   //Turn on buzzer if mode enabled.
   if ( mode & MODE_ALARM )
-    digitalWrite( PIN_BUZZER, HIGH );
+    digitalWrite( PIN_BUZZER,   HIGH );
 
-  //Turn on external device if mode enabled.
-  if ( mode & MODE_EXTERN )
-    digitalWrite( PIN_EXTERN, HIGH );
+  //Turn on EXTERNALal device if mode enabled.
+  if ( mode & MODE_EXTERNAL )
+    digitalWrite( PIN_EXTERNAL, HIGH );
 }
 
 //Blink the LEDs and track auto reset counter if active.
@@ -202,8 +202,8 @@ void trippedStateAction ( )
   if ( mode & MODE_ALARM )
     digitalWrite( PIN_LED_BUZZER, pulse );
 
-  if ( mode & MODE_EXTERN )
-    digitalWrite( PIN_LED_EXTERN, pulse );
+  if ( mode & MODE_EXTERNAL )
+    digitalWrite( PIN_LED_EXTERNAL, pulse );
 
   if ( mode & MODE_AUTORESET )
   {
